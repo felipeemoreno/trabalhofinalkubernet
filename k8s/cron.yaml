@@ -1,0 +1,12 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wr5-cron
+spec:
+  template:
+    spec:
+      containers:
+      - name: wr5-cron
+        image: wr5solutions/cron
+        command: ['yarn', 'dev']
+      restartPolicy: OnFailure

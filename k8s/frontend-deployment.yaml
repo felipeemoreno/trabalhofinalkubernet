@@ -1,0 +1,37 @@
+# Source: https://cloud.google.com/kubernetes-engine/docs/tutorials
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wr5-frontend
+spec:
+  selector:
+    matchLabels:
+      app: wr5-frontend
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: wr5-frontend
+    spec:
+      containers:
+      - name: wr5-frontend
+        image: "wr5solutions/wr5-frontend"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ilb-service-frontend
+  annotations:
+    networking.gke.io/load-balancer-type: "Internal"
+  labels:
+    app: wr5-frontend
+spec:
+  type: LoadBalancer
+  selector:
+    app: wr5-frontend
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
+---

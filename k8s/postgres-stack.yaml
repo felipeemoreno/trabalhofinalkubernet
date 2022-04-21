@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wr5-backend-postgres
+  labels:
+    app: wr5-backend-postgres
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5432
+    protocol: TCP
+  selector:
+    app: wr5-backend-postgres
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wr5-backend-postgres
+  labels:
+    app: wr5-backend-postgres
+spec:
+  selector:
+    matchLabels:
+      app: wr5-backend-postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: wr5-backend-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+              name: postgres
+          envFrom:
+            - secretRef:
+                name: postgres-secrets
+            - configMapRef:
+                name: postgres-config
+          volumeMounts:
+            - name: wr5-backend-postgres-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: wr5-backend-postgres-storage
+          persistentVolumeClaim:
+            claimName: wr5-backend-postgres-pv-claim
